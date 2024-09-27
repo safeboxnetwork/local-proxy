@@ -37,7 +37,7 @@
 			        {"HTTP": "8080"},
 				{"EXEC": "/ready.sh"}
 				],
-			"EXTRA": "--restart on-failure --log-opt max-size=500m --label ROLES=loadbalancer" ,
+			"EXTRA": "--restart=always --log-opt max-size=500m --label ROLES=loadbalancer" ,
 			"DEPEND": [ ],
 			"START_ON_BOOT": "true",
 			"CMD": "null",
