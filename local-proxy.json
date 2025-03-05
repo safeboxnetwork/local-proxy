@@ -5,7 +5,7 @@
 	},
 	"containers": [
 		{ 
-			"IMAGE": "registry.format.hu/local-loadbalancer:2.5.4",
+			"IMAGE": "safebox/local-loadbalancer:2.5.4",
 			"NAME": "localloadbalancer",
 			"SELECTOR": "localloadbalancer",
 			"UPDATE": "true",
