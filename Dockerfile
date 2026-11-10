@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.19
+FROM alpine:3.24
 
 # runtime dependencies
 RUN set -eux; \
@@ -28,9 +28,9 @@ RUN set -eux; \
 	mkdir /var/lib/haproxy; \
 	chown haproxy:haproxy /var/lib/haproxy
 
-ENV HAPROXY_VERSION 3.0-dev11
-ENV HAPROXY_URL https://www.haproxy.org/download/3.0/src/devel/haproxy-3.0-dev11.tar.gz
-ENV HAPROXY_SHA256 111530dfc240f516d501e77f5066471db4541011c1fb3b2cc1ed509610f810a1
+ENV HAPROXY_VERSION 3.4.7
+ENV HAPROXY_URL https://www.haproxy.org/download/3.4/src/haproxy-3.4.7.tar.gz
+ENV HAPROXY_SHA256 ccfd342f3724c2cd659574044d788f44e20b212467c6bd5edbbfc517a2775dca
 
 # see https://sources.debian.net/src/haproxy/jessie/debian/rules/ for some helpful navigation of the possible "make" arguments
 RUN set -eux; \
@@ -61,9 +61,12 @@ RUN set -eux; \
 		USE_OPENSSL=1 \
 		USE_PCRE2=1 USE_PCRE2_JIT=1 \
 		USE_PROMEX=1 \
-		\
-		EXTRA_OBJS=" \
-		" \
+		# https://github.com/haproxy/haproxy/blob/a203ce685464988afbd92c8a376fcafae9bab5b5/INSTALL#L368-L373
+		USE_PTHREAD_EMULATION=1 \
+		# https://www.haproxy.com/blog/announcing-haproxy-3-2#quic-protocol
+		# [in 3.2] QUIC TLS API was ported to OpenSSL 3.5
+		# Openssl 3.5+ is available on Debian Trixie and Alpine 3.22 and newer
+		USE_QUIC=1 \
 	'; \
 	\
 	nproc="$(getconf _NPROCESSORS_ONLN)"; \
@@ -95,7 +98,17 @@ STOPSIGNAL SIGUSR1
 # https://github.com/docker-library/haproxy/issues/200
 WORKDIR /var/lib/haproxy
 COPY haproxy.cfg /usr/local/etc/haproxy/
-RUN chown -R haproxy:haproxy /usr/local/etc/haproxy
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh; \
+	chown -R haproxy:haproxy /usr/local/etc/haproxy
 
-CMD haproxy -W -db -f /usr/local/etc/haproxy/haproxy.cfg
+EXPOSE 80 443
+
+# PROXY_PROTOCOL=TRUE makes the frontends accept connections carrying a
+# PROXY protocol header (accept-proxy). Any other value (default: FALSE)
+# keeps the plain listeners.
+ENV PROXY_PROTOCOL=FALSE
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["haproxy", "-W", "-db", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
 USER haproxy
