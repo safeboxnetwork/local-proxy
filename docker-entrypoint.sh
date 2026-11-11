@@ -12,3 +12,5 @@ case "${PROXY_PROTOCOL:-false}" in
 		export BIND_PROXY_PROTOCOL=
 		;;
 esac
+
+haproxy -W -db -f /usr/local/etc/haproxy/haproxy.cfg

@@ -108,7 +108,5 @@ EXPOSE 80 443
 # PROXY protocol header (accept-proxy). Any other value (default: FALSE)
 # keeps the plain listeners.
 ENV PROXY_PROTOCOL=FALSE
-
-ENTRYPOINT ["docker-entrypoint.sh"]
 USER haproxy
-CMD ["haproxy", "-W", "-db", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
+ENTRYPOINT ["docker-entrypoint.sh"]
