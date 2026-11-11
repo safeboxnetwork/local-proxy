@@ -98,9 +98,8 @@ STOPSIGNAL SIGUSR1
 # https://github.com/docker-library/haproxy/issues/200
 WORKDIR /var/lib/haproxy
 COPY haproxy.cfg /usr/local/etc/haproxy/
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh; \
-	chown -R haproxy:haproxy /usr/local/etc/haproxy
+
+RUN chown -R haproxy:haproxy /usr/local/etc/haproxy
 
 EXPOSE 80 443
 
@@ -108,5 +107,6 @@ EXPOSE 80 443
 # PROXY protocol header (accept-proxy). Any other value (default: FALSE)
 # keeps the plain listeners.
 ENV PROXY_PROTOCOL=FALSE
+
 USER haproxy
-ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["haproxy", "-W", "-db", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
