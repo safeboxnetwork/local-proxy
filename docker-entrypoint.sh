@@ -12,5 +12,3 @@ case "${PROXY_PROTOCOL:-false}" in
 		export BIND_PROXY_PROTOCOL=
 		;;
 esac
-
-exec haproxy "$@"

@@ -110,5 +110,5 @@ EXPOSE 80 443
 ENV PROXY_PROTOCOL=FALSE
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["haproxy", "-W", "-db", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
 USER haproxy
+CMD ["haproxy", "-W", "-db", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
